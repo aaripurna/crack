@@ -1,3 +1,5 @@
+require "http/client"
+
 module Crack
   class Response
     class Message
@@ -8,10 +10,14 @@ module Crack
       end
     end
 
-    getter :status, :headers, :messages
+    getter :status, :headers, :messages, :cookies
     setter :body, :status, :messages
 
-    def initialize(@status : Int32, @headers : Hash(String, String), @body : Array(String), @messages : Array(Message) = Array(Message).new)
+    def initialize(@status : Int32,
+                  @headers : HTTP::Headers,
+                  @body : Array(String),
+                  @messages : Array(Message) = Array(Message).new,
+                  @cookies : HTTP::Cookies = HTTP::Cookies.new)
     end
 
     def content_type

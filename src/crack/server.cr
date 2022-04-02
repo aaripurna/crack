@@ -10,7 +10,7 @@ module Crack
 
     @applications : Array(Crack::Application::Base)
 
-    def initialize(@port : Int32)
+    def initialize(@port : Int32, @use_cookie : Bool = true)
       @applications = Array(Crack::Application::Base).new()
     end
 
@@ -32,7 +32,7 @@ module Crack
 
         log.info("Request #{request.method} #{request.path} #{request.query} #{request.version}")
 
-        response = Crack::Response.new(200, Hash(String, String).new, Array(String).new)
+        response = Crack::Response.new(200, HTTP::Headers.new, Array(String).new, cookies: context.request.cookies)
 
         application = Application::Caller.new(@applications)
 
@@ -40,9 +40,15 @@ module Crack
 
         context.response.status = HTTP::Status.new(response.status)
 
-        headers = response.headers.each do |key, value|
-          context.response.headers[key] = value
+        context.response.headers.merge! response.headers
+
+        if @use_cookie
+          response.cookies.each do |cookie|
+            cookie.http_only = true
+            context.response.cookies << cookie
+          end
         end
+
         context.response.print response.body
       end
 

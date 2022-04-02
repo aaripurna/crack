@@ -30,7 +30,7 @@ module Crack
       { request, response }
     end
 
-    def file(request_path)
+    def file(request_path) : Tuple(String, String) | Nil
       files = Dir["#{@asset_path}/*"].reject { |f| @allowed_assets.none?(f.split(".").last) }
       file_name = files.find { |f| "#{@request_prefix}#{f.split(@asset_path).last}" == request_path }
 
