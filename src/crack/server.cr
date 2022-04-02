@@ -34,9 +34,9 @@ module Crack
 
         response = Crack::Response.new(200, Hash(String, String).new, Array(String).new)
 
-        middleware = Application::Caller.new(@applications)
+        application = Application::Caller.new(@applications)
 
-        request, response = middleware.call(request, response)
+        request, response = application.call(request, response)
 
         context.response.status = HTTP::Status.new(response.status)
 

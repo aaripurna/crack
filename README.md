@@ -9,7 +9,7 @@ TODO: Write a description here
    ```yaml
    dependencies:
      crack:
-       github: your-github-user/crack
+       github: aaripurna/crack
    ```
 
 2. Run `shards install`

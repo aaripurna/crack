@@ -10,6 +10,16 @@ module Crack
     end
 
     class Handler < Base
+      setter :continue
+
+      def initialize
+        @continue = true
+      end
+
+      def continue?
+        @continue
+      end
+
       def handle(request : Request, response : Response) : Tuple(Request, Response)
         { request, response }
       end
@@ -21,7 +31,9 @@ module Crack
       def call(request : Request, response : Response) : Tuple(Request, Response)
         request, response = handle(request, response)
 
-        return { request, response} unless @next_handler
+        if !continue? || @next_handler.nil?
+          return { request, response }
+        end
 
         @next_handler.not_nil!.call(request, response)
       end
@@ -36,7 +48,7 @@ module Crack
       end
 
       def call(request : Request, response : Response) : Tuple(Request, Response)
-        middleware = @middlewares.reduce(nil) do |memo, current|
+        @middlewares.reduce(nil) do |memo, current|
           unless memo
             next current
           end
@@ -44,6 +56,8 @@ module Crack
           memo.next_handler = current
           current
         end
+
+        middleware = @middlewares.first
 
         return { request, response } unless middleware
 
